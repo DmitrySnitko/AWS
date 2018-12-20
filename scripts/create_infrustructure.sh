@@ -10,7 +10,7 @@ SECURITY_GROUP_ID=sg-0f0cc75216aa3485b
 SUBNET_ID=subnet-0a8edbfe14d168679
 TAGS="ResourceType=instance,Tags=[{Key=Name,Value=NAME},{Key=tag,Value=${KEY_NAME}}]"
 
-initial_command
+initial_command()
 {
   cat <<EOF
 #!/bin/sh
