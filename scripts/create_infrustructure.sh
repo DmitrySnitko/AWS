@@ -78,7 +78,7 @@ start ()
 #      start_vm 10.3.1.$((60+i)) no-associate-public-ip-address ${USER_NAME}-vm$i > /dev/null
 #    done
 
-  sleep 3s
+  sleep 5s
   dns_name=$(get_dns_name "$instance_id")
   echo $dns_name
 
