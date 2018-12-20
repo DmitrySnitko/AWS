@@ -51,7 +51,7 @@ start_vm()
 
 get_dns_name()
 {
-  local instances="$1"
+  local instance="$1"
 
   aws ec2 describe-instances --instance-ids ${instance} \
   | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].Association.PublicDnsName'
