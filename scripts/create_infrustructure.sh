@@ -6,9 +6,19 @@ VPC_ID=vpc-0e4dfd64aef6a44fc
 KEY_NAME=user6
 USER_NAME=user6-vpc3
 SHUTDOWN_TYPE=stop
-SECURITY_GROUP=sg-0f0cc75216aa3485b
+SECURITY_GROUP_ID=sg-0f0cc75216aa3485b
 SUBNET_ID=subnet-0a8edbfe14d168679
 TAGS="ResourceType=instance,Tags=[{Key=Name,Value=NAME},{Key=tag,Value=${KEY_NAME}}]"
+
+initial_command
+{
+  cat <<EOF
+#!/bin/sh
+
+curl https://raw.githubusercontent.com/DmitrySnitko/AWS/master/scripts/install.sh | su -c 'bash -s' admin
+EOF
+}
+
 
 start_vm()
 {
@@ -16,7 +26,7 @@ start_vm()
   local private_ip_addr="$1"
   local public_ip="$2"
   local name="$3"
-
+  local user_data="$4"
   local tags=$(echo $TAGS | sed s/NAME/$name/)
   #local tags=$(TAGS/NAME/$name)
 
@@ -28,8 +38,9 @@ start_vm()
     --instance-initiated-shutdown-behavior "$SHUTDOWN_TYPE" \
     --private-ip-address "$private_ip_addr" \
     --tag-specifications "$tags" \
+    --user-data "$user_data" \
     --${public_ip} \
-    --security-group-id "$SECURITY_GROUP"
+    --security-group-id "$SECURITY_GROUP_ID"
 
     #--elastic-gpu-specification <value> \
     #--elastic-inference-accelerators <value> \
@@ -55,18 +66,19 @@ start ()
 #  elif [ "$1" = "1" ]; then 
 
 #  start_log=$(
-    start_vm 10.3.1.61 associate-public-ip ${USER_NAME}-vm1 >> ~/start_log
+  start_vm 10.3.1.61 associate-public-ip ${USER_NAME}-vm1 file://<(initial_command) > ~/start_log
 #  )
-  sleep 5s
+  sleep 2s
 
   instance_id=$( cat ~/start_log | jq -r .Instances[0].InstanceId)
+  echo ${instance_id}
 
 #  else
 #    for i in {2..2}; do
 #      start_vm 10.3.1.$((60+i)) no-associate-public-ip-address ${USER_NAME}-vm$i > /dev/null
 #    done
 
-  sleep 10s
+  sleep 3s
   dns_name=$(get_dns_name "$instance_id")
   echo $dns_name
 
